@@ -12,14 +12,14 @@ Import::php("OpenM-SSO.api.Impl.DAO.OpenM_SSO_ClientRightsDAO");
  */
 class OpenM_SSO_ClientRightsDAO_FSImpl extends OpenM_SSO_DAO_FSImpl implements OpenM_SSO_ClientRightsDAO {
 
-    public function create($clientId, $rights) {
-        self::$db->request(OpenM_FS::insert(self::SSO_TABLE_NAME, array(
-                    self::CLIENT_ID => $clientId,
-                    self::RIGHTS => $rights
-        )));
+    const CLIENT_RIGHTS_DIR = "client_rights";
 
+    public function create($clientId, $rights) {
+        $clientRights = new Properties();
         $return = new HashtableString();
-        return $return->put(self::CLIENT_ID, $clientId)->put(self::RIGHTS, $rights);
+        $return->put(self::CLIENT_ID, $clientId)->put(self::RIGHTS, $rights);
+        $clientRights->setAll($return);
+        $clientRights->save($this->root . "/" . self::CLIENT_RIGHTS_DIR . "/" . OpenM_Crypto::md5($clientId));
     }
 
     public function remove($rightId) {

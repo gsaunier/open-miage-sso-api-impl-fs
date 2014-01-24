@@ -12,27 +12,26 @@ Import::php("OpenM-SSO.api.Impl.DAO.OpenM_SSO_AdminDAO");
  */
 class OpenM_SSO_AdminDAO_FSImpl extends OpenM_SSO_DAO_FSImpl implements OpenM_SSO_AdminDAO {
 
-    public function create($user_id, $user_level) {
-        self::$db->request(OpenM_FS::insert(self::SSO_TABLE_NAME, array(
-                    self::USER_ID => $user_id,
-                    self::USER_LEVEL => $user_level
-                )));
+    const ADMIN_DIR = "admin";
 
-        $return = new HashtableString();
-        return $return->put(self::USER_ID, $user_id)->put(self::USER_LEVEL, $user_level);
+    public function create($user_id, $user_level) {
+        $admin = new Properties();
+        $admin->set(self::USER_ID, $user_id)->set(self::USER_LEVEL, $user_level);
+        $admin->save($this->root . "/" . self::ADMIN_DIR . "/" . $user_id);
+        return $admin->getAll();
     }
 
     public function remove($userId) {
-        self::$db->request(OpenM_FS::delete(self::SSO_TABLE_NAME, array(self::USER_ID, $userId)));
+        unlink($this->root . "/" . self::ADMIN_DIR . "/" . $userId);
     }
 
     public function get($userId = null) {
         if ($userId != null) {
-            $array = array(self::USER_ID => $userId);
-            return self::$db->request_HashtableString(OpenM_FS::select(self::SSO_TABLE_NAME, $array),self::USER_ID);
+
+            return;
         }
         else
-            return self::$db->request_HashtableString(OpenM_FS::select(self::SSO_TABLE_NAME),self::USER_ID);
+            return;
     }
 
 }
